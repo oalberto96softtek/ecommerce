@@ -4,6 +4,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var router = express.Router();
 var mongoOp = require('./models/mongo');
+var products = require('./models/products');
 
 
 app.use(bodyParser.json());
@@ -13,10 +14,25 @@ router.get('/', function(req, res){
 	res.json({'error': false, 'message': 'Hello world'});
 });
 
+router.route('/products').get(function(req, res){
+	var response = {};
+	products.find({}, function(err, data){
+		res.json(data);
+	})
+}).post(function(req, res){
+	const db = new products();
+	db.name = req.body.name;
+	db.price = req.body.price;
+	db.inventory = 0;
+	db.save(function(e) {
+		res.json('Product added');
+	})
+})
+
 router.route("/users")
     .get(function(req,res){
         var response = {};
-        mongoOp.find({},function(err,data){
+        mongoOp.find({}, function(err,data){
         // Mongo command to fetch all data from collection.
             if(err) {
                 response = {"error" : true,"message" : "Error fetching data"};
